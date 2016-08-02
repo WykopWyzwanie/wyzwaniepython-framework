@@ -25,14 +25,20 @@ class Wyzwanie:  # TODO singleton?
         if python_version not in (2, 3):
             raise ValueError('Python version has to be one of (2, 3)')
 
-    def main_function(self, func):
-        self._validate_main_function(func)
-        self._main_function = func
+    def register(self, func, name=None):
+        name = name or func.__name__
+        self._validate_register_arguments(func, name)
+        self._registered_methods[name] = func
         return func
 
-    def _validate_main_function(self, f):
+    def _validate_register_arguments(self, f, name):
         if not isfunction(f):
-            raise TypeError('Wyzwanie.main_function has to be used as a function decorator')
+            raise TypeError('Wyzwanie.register has to be used as a function decorator')
+        if not isinstance(name, str):
+            raise TypeError('Wyzwanie.register name argument has to be a string')
+
+    def main_function(self, func):
+        return self.register(func, 'main')
 
     def run(self):
         self._config = self._get_config_file()
